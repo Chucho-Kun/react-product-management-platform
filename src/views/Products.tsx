@@ -1,15 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { getProducts } from "../services/ProductService";
+import ProductsDetails from "../components/ProductsDetails";
+import type { Product } from "../types";
 
 export async function loader(){
   
   const products = await getProducts()
-  console.log(products);
-  
-  return {}
+
+  return products
 }
 
 export default function Products() {
+
+  const products = useLoaderData() as Product
+  
   return (
     <>
         <div className="flex justify-between">
@@ -22,6 +26,26 @@ export default function Products() {
             </Link>
         </div>
       
+        <div className="p-2">
+          <table className="w-full mt-5 table-auto">
+            <thead className="bg-slate-800 text-white">
+                <tr>
+                    <th className="p-2">Producto</th>
+                    <th className="p-2">Precio</th>
+                    <th className="p-2">Disponibilidad</th>
+                    <th className="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+              { products.map(product => (
+                <ProductsDetails 
+                  key={product.id}
+                  product={product}
+                />
+              )) }
+            </tbody>
+          </table>
+        </div>
     </>
   )
 }
