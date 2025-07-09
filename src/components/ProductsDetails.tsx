@@ -27,8 +27,9 @@ export default function ProductsDetails( { product } : ProductDetailsProps ) {
                     <Link
                         className="bg-indigo-400 text-white rounded-lg w-full p-2 uppercase font-bold text-xs text-center hover:bg-indigo-600"
                         to={`/productos/${ product.id }/editar`} 
-                    > Editar </Link>
-                    <button
+                    > Editar </Link> 
+
+                    {/**<button
                         className="bg-indigo-400 text-white rounded-lg w-10 p-2 uppercase font-bold text-xs text-center hover:bg-indigo-600 cursor-pointer"
                         onClick={ () => navigate( `/productos/${ product.id }/editar` , {
                             state: {
@@ -37,7 +38,7 @@ export default function ProductsDetails( { product } : ProductDetailsProps ) {
                         } ) }
                     >
                         *
-                    </button>
+                    </button> */}
                     
                 </div>
             </td>
