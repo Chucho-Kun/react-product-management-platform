@@ -1,69 +1,102 @@
-# React + TypeScript + Vite
+# FRONT REST API REACT - TypeScript
+React Web Platform connected to an API hosted on a Node 22.14 + PostgreSQL 16.9 server ( PERN )
+## Technologies
+React + Typescript + TailwindCSS + Axios + Zod + Valibot + React Router
+## Developer Notes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### API documented with swagger - PERN Stack
+#### src/services/ProductService.ts
 ```
+import { safeParse , number , parse, pipe, transform , string } from "valibot";
+import { DrafProductSchema , ProductSchema, ProductsSchema, type Product } from "../types";
+import axios from "axios";
+import { toBoolean } from "../helpers";
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+type ProductData = {
+    [ k: string ] :FormDataEntryValue
+}
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+export async function addProduct( data : ProductData  ) {
+    
+    try{
+        const result = safeParse( DrafProductSchema , {
+            name: data.name,
+            price: +data.price
+        } )
+        if( result.success ){
+            const url = `${ import.meta.env.VITE_API_URL }/api/products`
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+            await axios.post( url , { 
+                name: result.output.name,
+                price: result.output.price
+             } )
+
+             
+        }else{
+            throw new Error(' Datos no válidos ')
+        }
+        
+    }catch(error){
+        console.log( error );
+    }
+
+}
+
+export async function getProducts() {
+    try{
+        const url = `${ import.meta.env.VITE_API_URL}/api/products`
+        const { data } = await axios( url )        
+        const result = safeParse( ProductsSchema , data.data )
+   
+        if( result.success ){
+            return result.output
+        }else{
+            throw new Error('Hubo un error...')
+        }
+        
+    }catch(error){
+        console.log(error);
+    }
+}
+
+export async function getProductsById( id : Product['id']) {
+    try{
+        const url = `${ import.meta.env.VITE_API_URL}/api/products/${id}`
+        const { data } = await axios( url )        
+        const result = safeParse( ProductSchema , data.data )
+        
+        if( result.success ){
+            return result.output
+        }else{
+            throw new Error('Hubo un error...')
+        }
+        
+    }catch(error){
+        console.log(error);
+    }
+}
+
+export async function updateProduct( data : ProductData , id : Product['id'] ) {
+    
+    try{
+        const NumberSchema = pipe( string(), transform(Number) , number() )
+
+        const result = safeParse( ProductSchema , {
+            id,
+            name: data.name,
+            price: parse( NumberSchema , data.price ),
+            availibility: toBoolean( data.availability.toString() )
+        })
+        
+        if( result.success ){
+            const url = `${ import.meta.env.VITE_API_URL}/api/products/${id}`
+            await axios.put( url , result.output)
+        }
+        
+    }catch(error){
+        console.log(error);
+        
+    }
+    
+}
 ```
