@@ -1,18 +1,24 @@
-import { Link, useLoaderData } from "react-router-dom";
-import { getProducts } from "../services/ProductService";
+import { Link, useLoaderData, type ActionFunctionArgs } from "react-router-dom";
+import { getProducts, updateProductAvailibility } from "../services/ProductService";
 import ProductsDetails from "../components/ProductsDetails";
 import type { Product } from "../types";
 
 export async function loader(){
-  
   const products = await getProducts()
-
   return products
+}
+
+export async function action({ request } : ActionFunctionArgs ) {
+
+  const data = Object.fromEntries( await request.formData() )
+  await updateProductAvailibility( +data.id )
+  
+  return {}
 }
 
 export default function Products() {
 
-  const products = useLoaderData() as Product
+  const products = useLoaderData() as Product[]
   
   return (
     <>
@@ -24,6 +30,7 @@ export default function Products() {
             >
                 Agregar producto
             </Link>
+            
         </div>
       
         <div className="p-2">
