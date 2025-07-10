@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from "react";
 
 
 export default function ErrorMessages({children} : PropsWithChildren ) {
