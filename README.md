@@ -1,5 +1,7 @@
 # FRONT REST API REACT/TypeScript
 React Web Platform connected to an API hosted on a Node 22.14 + PostgreSQL 16.9 server ( PERN )
+![screenshot 1](src/assets/shot1.png)
+![screenshot 2](src/assets/shot2.png)
 ## Technologies
 React + Typescript + TailwindCSS + Axios + Zod + Valibot + React Router
 ## Developer Notes
